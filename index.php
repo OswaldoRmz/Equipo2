@@ -1,3 +1,48 @@
+<?php
+require_once 'config/conexion.php';
+
+$usuario = usuarioActual();
+$empresa = obtenerDatosEmpresa($pdo);
+
+// 1. Cargar los 3 equipos activos más prestados desde la base de datos
+$sqlEquipos = "
+    SELECT
+        e.id_equipo,
+        e.codigo,
+        e.nombre,
+        e.descripcion,
+        e.ubicacion,
+        e.estado,
+        m.nombre AS marca,
+        c.nombre AS categoria,
+        COUNT(p.id_prestamo) AS total_prestamos
+    FROM equipo e
+    INNER JOIN marca m ON e.id_marca = m.id_marca
+    INNER JOIN categoria c ON e.id_categoria = c.id_categoria
+    LEFT JOIN prestamo p ON e.id_equipo = p.id_equipo
+    WHERE e.visibilidad = 'Activo'
+    GROUP BY e.id_equipo
+    ORDER BY total_prestamos DESC, e.id_equipo ASC
+    LIMIT 3
+";
+$equiposDestacados = $pdo->query($sqlEquipos)->fetchAll();
+
+// 2. Cargar los servicios populares activos desde la base de datos
+$sqlServicios = "
+    SELECT
+        s.id_servicio,
+        s.nombre,
+        s.descripcion,
+        s.precio_estimado,
+        c.nombre AS categoria
+    FROM servicio s
+    INNER JOIN categoria c ON s.id_categoria = c.id_categoria
+    WHERE s.estado = 'Activo'
+    ORDER BY s.id_servicio ASC
+    LIMIT 4
+";
+$serviciosPopulares = $pdo->query($sqlServicios)->fetchAll();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,16 +70,15 @@
   <header class="main-navbar sticky-top">
     <nav class="navbar navbar-expand-lg py-3">
       <div class="container">
-        <!-- Logo y Marca -->
-        <a class="navbar-brand d-flex align-items-center gap-3 m-0" href="index.html">
-          <svg width="46" height="46" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Capsule Tech">
-            <rect width="64" height="64" rx="14" fill="#090C10" />
-            <circle cx="32" cy="31" r="24" stroke="#FFFFFF" stroke-width="2" />
-            <path d="M43.5 23.5C41.2 19.6 36.9 17 32 17C24.3 17 18 23.3 18 31C18 38.7 24.3 45 32 45C36.9 45 41.2 42.4 43.5 38.5L37.5 35C36.3 36.8 34.3 38 32 38C28.1 38 25 34.9 25 31C25 27.1 28.1 24 32 24C34.3 24 36.3 25.2 37.5 27L43.5 23.5Z" fill="#FFFFFF" />
-            <circle cx="32" cy="31" r="4.5" stroke="#FFFFFF" stroke-width="2.2" />
-            <rect x="11" y="47" width="42" height="8" rx="4" fill="#090C10" stroke="#FFFFFF" stroke-width="1.5" />
-            <text x="32" y="52.6" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="4.6" font-weight="700" text-anchor="middle" letter-spacing="0.4">CAPSULE CORP</text>
-          </svg>
+        <!-- Logo oficial y Marca -->
+        <a class="navbar-brand d-flex align-items-center gap-3 m-0" href="index.php">
+          <img
+            src="images/logo.jpeg"
+            alt="Logo oficial Capsule Tech"
+            width="46"
+            height="46"
+            style="border-radius: 12px; object-fit: cover;"
+          />
           <div>
             <div class="brand-title">Capsule Tech</div>
             <div class="brand-subtitle">Servicios Tecnológicos</div>
@@ -50,20 +94,39 @@
         <div class="collapse navbar-collapse justify-content-end mt-3 mt-lg-0" id="mainNav">
           <ul class="navbar-nav align-items-lg-center gap-1 gap-lg-2">
             <li class="nav-item">
-              <a class="nav-link nav-pill-link active" aria-current="page" href="#">Inicio</a>
+              <a class="nav-link nav-pill-link active" aria-current="page" href="index.php">Inicio</a>
             </li>
             <li class="nav-item">
               <a class="nav-link nav-pill-link" href="#seccion-servicios">Servicios</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link nav-pill-link" href="#seccion-prestamos">Inventario</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link nav-pill-link" href="#">Perfil</a>
+              <a class="nav-link nav-pill-link" href="inventario.php">Inventario</a>
             </li>
             <li class="nav-item">
               <a class="nav-link nav-pill-link" href="#footer-institucional">Acerca de</a>
             </li>
+
+            <?php if ($usuario): ?>
+              <li class="nav-item dropdown ms-lg-2">
+                <a class="nav-link nav-pill-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-person-circle"></i>
+                  <span><?= htmlspecialchars(explode(' ', $usuario['nombres'])[0]) ?></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
+                  <li><span class="dropdown-item-text small text-muted"><?= htmlspecialchars($usuario['correo']) ?></span></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="inventario.php#titulo-prestamos-activos"><i class="bi bi-laptop me-2"></i>Mis préstamos</a></li>
+                  <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
+                </ul>
+              </li>
+            <?php else: ?>
+              <li class="nav-item ms-lg-2">
+                <a class="btn btn-capsule-outline py-2 px-3" href="login.php">Iniciar sesión</a>
+              </li>
+              <li class="nav-item">
+                <a class="btn btn-capsule-primary py-2 px-3" href="crear_cuenta.php">Crear cuenta</a>
+              </li>
+            <?php endif; ?>
           </ul>
         </div>
       </div>
@@ -91,18 +154,18 @@
                 <a href="#seccion-servicios" class="btn btn-capsule-primary">
                   Explorar servicios
                 </a>
-                <a href="#seccion-prestamos" class="btn btn-capsule-outline">
+                <a href="inventario.php" class="btn btn-capsule-outline">
                   Consultar inventario
                 </a>
               </div>
             </div>
 
-            <!-- Columna derecha: Buscador rápido -->
+            <!-- Columna derecha: Buscador rápido hacia Inventario -->
             <div class="col-lg-5 offset-lg-1">
               <div class="search-widget-card">
                 <h2 class="search-widget-title">¿Qué necesitas hoy?</h2>
 
-                <form action="#" method="GET" role="search">
+                <form action="inventario.php" method="GET" role="search">
                   <div class="search-input-wrapper">
                     <i class="bi bi-search search-icon"></i>
                     <input
@@ -117,9 +180,9 @@
                 </form>
 
                 <div class="d-flex flex-wrap gap-2 mt-3">
-                  <button type="button" class="quick-filter-chip" data-filter="prestamos">Préstamos</button>
-                  <button type="button" class="quick-filter-chip" data-filter="soporte">Soporte</button>
-                  <button type="button" class="quick-filter-chip" data-filter="licencias">Licencias</button>
+                  <a href="inventario.php" class="quick-filter-chip text-decoration-none">Préstamos</a>
+                  <a href="#seccion-servicios" class="quick-filter-chip text-decoration-none">Soporte</a>
+                  <a href="#seccion-servicios" class="quick-filter-chip text-decoration-none">Licencias</a>
                 </div>
 
                 <p class="search-widget-note">Una búsqueda. Muchas posibilidades.</p>
@@ -130,93 +193,151 @@
       </div>
     </section>
 
-    <!-- ================= SECCIÓN: PRÉSTAMOS DE EQUIPOS (BD) ================= -->
+    <!-- ================= SECCIÓN: PRÉSTAMOS DE EQUIPOS (CARGADO DESDE BD) ================= -->
     <section id="seccion-prestamos" class="py-5 bg-white">
       <div class="container">
-        <!-- Encabezado de sección -->
         <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
           <div>
             <h2 class="section-title">Préstamos de equipos</h2>
             <p class="section-subtitle mb-0">Los más prestados, listos para tu próximo proyecto.</p>
           </div>
-          <a href="#" class="section-action-link">
+          <a href="inventario.php" class="section-action-link">
             Ver inventario completo <i class="bi bi-arrow-right ms-1"></i>
           </a>
         </div>
 
-        <!-- CONTENEDOR PREPARADO PARA INYECTAR DESDE BASE DE DATOS -->
-        <div class="row g-4" id="contenedor-prestamos-equipos" data-source="db-prestamos">
-          <!-- Espacio reservado 1 -->
-          <div class="col-md-6 col-lg-4">
-            <div class="db-card-placeholder">
-              <!-- <i class="bi bi-database-dash fs-4 mb-2"></i> -->
-              <!-- Espacio preparado: Equipo #01 (BD) -->
+        <div class="row g-4" id="contenedor-prestamos-equipos">
+          <?php if (count($equiposDestacados) > 0): ?>
+            <?php foreach ($equiposDestacados as $index => $eq): ?>
+              <?php
+                $ranking = str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT);
+                $disponible = ($eq['estado'] === 'Disponible');
+                $icono = iconoCategoria($eq['categoria']);
+                $detalle = trim($eq['marca'] . ($eq['descripcion'] ? ' · ' . $eq['descripcion'] : ' · ' . $eq['codigo']));
+              ?>
+              <div class="col-md-6 col-lg-4">
+                <article class="equipment-card h-100">
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="card-icon-box">
+                      <i class="bi <?= htmlspecialchars($icono) ?>"></i>
+                    </div>
+                    <span class="rank-pill"><?= $ranking ?> &middot; Más prestado</span>
+                  </div>
+
+                  <h3 class="equipment-title"><?= htmlspecialchars($eq['nombre']) ?></h3>
+                  <p class="equipment-specs"><?= htmlspecialchars($detalle) ?></p>
+
+                  <div class="mt-auto pt-2">
+                    <?php if ($disponible): ?>
+                      <div class="availability-label text-available mb-2">
+                        Disponible &middot; <?= htmlspecialchars($eq['ubicacion'] ?: 'Almacén') ?>
+                      </div>
+                      <div class="availability-track mb-4">
+                        <div class="availability-fill" style="width: 100%;"></div>
+                      </div>
+
+                      <?php if ($usuario): ?>
+                        <a href="inventario.php?solicitar=<?= (int)$eq['id_equipo'] ?>" class="btn btn-card-loan w-100">
+                          Solicitar préstamo
+                        </a>
+                      <?php else: ?>
+                        <button
+                          type="button"
+                          class="btn btn-card-loan w-100"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalRequiereSesion"
+                          data-accion="solicitar el préstamo de <?= htmlspecialchars($eq['nombre']) ?>"
+                        >
+                          Solicitar préstamo
+                        </button>
+                      <?php endif; ?>
+
+                    <?php else: ?>
+                      <div class="availability-label text-unavailable mb-2">
+                        Prestado actualmente
+                      </div>
+                      <div class="availability-track mb-4">
+                        <div class="availability-fill" style="width: 0%;"></div>
+                      </div>
+                      <a href="inventario.php" class="btn btn-card-alt w-100">
+                        Ver alternativas
+                      </a>
+                    <?php endif; ?>
+                  </div>
+                </article>
+              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="col-12">
+              <div class="alert alert-light border text-center py-4">
+                No hay equipos activos registrados en este momento.
+              </div>
             </div>
-          </div>
-          <!-- Espacio reservado 2 -->
-          <div class="col-md-6 col-lg-4">
-            <div class="db-card-placeholder">
-              <!-- <i class="bi bi-database-dash fs-4 mb-2"></i> -->
-              <!-- Espacio preparado: Equipo #02 (BD) -->
-            </div>
-          </div>
-          <!-- Espacio reservado 3 -->
-          <div class="col-md-6 col-lg-4">
-            <div class="db-card-placeholder">
-              <!-- <i class="bi bi-database-dash fs-4 mb-2"></i> -->
-              <!-- Espacio preparado: Equipo #03 (BD) -->
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
 
-        <p class="section-footnote mt-3 mb-0">Disponibilidad de ejemplo para el diseño.</p>
+        <p class="section-footnote mt-3 mb-0">
+          Consulta el catálogo completo en <a href="inventario.php" class="text-decoration-none">Inventario</a> para ver todos los equipos.
+        </p>
       </div>
     </section>
 
-    <!-- ================= SECCIÓN: SERVICIOS POPULARES (BD) ================= -->
+    <!-- ================= SECCIÓN: SERVICIOS POPULARES (CARGADO DESDE BD) ================= -->
     <section id="seccion-servicios" class="py-5 section-tinted">
       <div class="container">
-        <!-- Encabezado de sección -->
         <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
           <div>
             <h2 class="section-title">Servicios populares</h2>
             <p class="section-subtitle mb-0">Soluciones para que nada detenga tus ideas.</p>
           </div>
-          <a href="#" class="section-action-link">
+          <a href="#seccion-servicios" class="section-action-link">
             Ver todos los servicios <i class="bi bi-arrow-right ms-1"></i>
           </a>
         </div>
 
-        <!-- CONTENEDOR PREPARADO PARA INYECTAR DESDE BASE DE DATOS -->
-        <div class="row g-4" id="contenedor-servicios-populares" data-source="db-servicios">
-          <!-- Espacio reservado 1 -->
-          <div class="col-sm-6 col-lg-3">
-            <div class="db-card-placeholder db-card-placeholder-sm">
-              <!-- <i class="bi bi-database-dash fs-4 mb-2"></i> -->
-              <!-- Espacio preparado: Servicio #01 (BD) -->
+        <div class="row g-4" id="contenedor-servicios-populares">
+          <?php if (count($serviciosPopulares) > 0): ?>
+            <?php foreach ($serviciosPopulares as $srv): ?>
+              <?php $iconoSrv = iconoCategoria($srv['categoria']); ?>
+              <div class="col-sm-6 col-lg-3">
+                <article class="service-card h-100">
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="card-icon-box">
+                      <i class="bi <?= htmlspecialchars($iconoSrv) ?>"></i>
+                    </div>
+                    <span class="rank-pill">$<?= number_format((float)$srv['precio_estimado'], 2) ?></span>
+                  </div>
+
+                  <h3 class="service-title"><?= htmlspecialchars($srv['nombre']) ?></h3>
+                  <p class="service-description">
+                    <?= htmlspecialchars($srv['descripcion'] ?: 'Servicio tecnológico especializado.') ?>
+                  </p>
+
+                  <?php if ($usuario): ?>
+                    <a href="#seccion-servicios" class="service-link mt-auto" onclick="alert('Servicio seleccionado: <?= htmlspecialchars(addslashes($srv['nombre'])) ?>. Próximamente módulo de órdenes.'); return false;">
+                      Solicitar servicio <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                  <?php else: ?>
+                    <a
+                      href="#"
+                      class="service-link mt-auto"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalRequiereSesion"
+                      data-accion="solicitar el servicio «<?= htmlspecialchars($srv['nombre']) ?>»"
+                    >
+                      Solicitar servicio <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                  <?php endif; ?>
+                </article>
+              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="col-12">
+              <div class="alert alert-light border text-center py-4">
+                No hay servicios disponibles por el momento.
+              </div>
             </div>
-          </div>
-          <!-- Espacio reservado 2 -->
-          <div class="col-sm-6 col-lg-3">
-            <div class="db-card-placeholder db-card-placeholder-sm">
-              <!-- <i class="bi bi-database-dash fs-4 mb-2"></i> -->        
-              <!-- Espacio preparado: Servicio #02 (BD) -->
-            </div>
-          </div>
-          <!-- Espacio reservado 3 -->
-          <div class="col-sm-6 col-lg-3">
-            <div class="db-card-placeholder db-card-placeholder-sm">
-              <!-- <i class="bi bi-database-dash fs-4 mb-2"></i> -->
-              <!-- Espacio preparado: Servicio #03 (BD) -->
-            </div>
-          </div>
-          <!-- Espacio reservado 4 -->
-          <div class="col-sm-6 col-lg-3">
-            <div class="db-card-placeholder db-card-placeholder-sm">
-              <!-- <i class="bi bi-database-dash fs-4 mb-2"></i> -->
-              <!-- Espacio preparado: Servicio #04 (BD) -->
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -230,7 +351,7 @@
             <p class="cta-subtitle mb-0">Cuéntanos qué sucede. Te ayudamos a dar el siguiente paso.</p>
           </div>
           <div class="flex-shrink-0">
-            <a href="#" class="btn btn-capsule-primary px-4">
+            <a href="mailto:<?= htmlspecialchars($empresa['correo_contacto'] ?? 'contacto@techsolutions.com') ?>" class="btn btn-capsule-primary px-4">
               Contactar soporte
             </a>
           </div>
@@ -246,14 +367,13 @@
         <!-- Columna 1: Identidad de marca -->
         <div class="col-md-6 col-lg-3">
           <div class="d-flex align-items-center gap-2 mb-3">
-            <svg width="38" height="38" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Capsule Tech">
-              <rect width="64" height="64" rx="14" fill="#090C10" />
-              <circle cx="32" cy="31" r="24" stroke="#FFFFFF" stroke-width="2" />
-              <path d="M43.5 23.5C41.2 19.6 36.9 17 32 17C24.3 17 18 23.3 18 31C18 38.7 24.3 45 32 45C36.9 45 41.2 42.4 43.5 38.5L37.5 35C36.3 36.8 34.3 38 32 38C28.1 38 25 34.9 25 31C25 27.1 28.1 24 32 24C34.3 24 36.3 25.2 37.5 27L43.5 23.5Z" fill="#FFFFFF" />
-              <circle cx="32" cy="31" r="4.5" stroke="#FFFFFF" stroke-width="2.2" />
-              <rect x="11" y="47" width="42" height="8" rx="4" fill="#090C10" stroke="#FFFFFF" stroke-width="1.5" />
-              <text x="32" y="52.6" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="4.6" font-weight="700" text-anchor="middle" letter-spacing="0.4">CAPSULE CORP</text>
-            </svg>
+            <img
+              src="images/logo.jpeg"
+              alt="Logo oficial Capsule Tech"
+              width="38"
+              height="38"
+              style="border-radius: 10px; object-fit: cover;"
+            />
             <span class="footer-brand-name">Capsule Tech</span>
           </div>
 
@@ -266,20 +386,20 @@
           </p>
         </div>
 
-        <!-- Columna 2: Nuestra misión (Preparado para BD) -->
+        <!-- Columna 2: Nuestra misión (BD: datos_empresa.mision) -->
         <div class="col-md-6 col-lg-3">
           <h3 class="footer-heading">Nuestra misión</h3>
-          <div id="contenedor-mision" class="footer-db-placeholder" data-source="db-mision">
-            <!-- Espacio preparado para Misión (BD) -->
-          </div>
+          <p id="contenedor-mision" class="footer-text mb-0">
+            <?= htmlspecialchars($empresa['mision'] ?? '') ?>
+          </p>
         </div>
 
-        <!-- Columna 3: Nuestra visión (Preparado para BD) -->
+        <!-- Columna 3: Nuestra visión (BD: datos_empresa.vision) -->
         <div class="col-md-6 col-lg-3">
           <h3 class="footer-heading">Nuestra visión</h3>
-          <div id="contenedor-vision" class="footer-db-placeholder" data-source="db-vision">
-            <!-- Espacio preparado para Visión (BD) -->
-          </div>
+          <p id="contenedor-vision" class="footer-text mb-0">
+            <?= htmlspecialchars($empresa['vision'] ?? '') ?>
+          </p>
         </div>
 
         <!-- Columna 4: Contáctanos -->
@@ -290,10 +410,10 @@
             Nuestro equipo te acompaña.
           </p>
           <div class="d-flex flex-column gap-2">
-            <a href="#" class="footer-action-link">
+            <a href="mailto:<?= htmlspecialchars($empresa['correo_contacto'] ?? 'contacto@techsolutions.com') ?>" class="footer-action-link">
               Enviar una consulta <i class="bi bi-arrow-right ms-1"></i>
             </a>
-            <a href="#" class="footer-action-link">
+            <a href="inventario.php#titulo-reglas-prestamo" class="footer-action-link">
               Centro de ayuda <i class="bi bi-arrow-right ms-1"></i>
             </a>
           </div>
@@ -312,56 +432,58 @@
     </div>
   </footer>
 
-  <!-- =========================================================================
-       PLANTILLAS HTML LISTAS PARA INYECTAR CON PHP / JAVASCRIPT DESDE LA BD
-       ========================================================================= -->
-
-  <!-- Plantilla 1: Tarjeta de Préstamo de Equipo -->
-  <template id="tpl-prestamo-equipo">
-    <div class="col-md-6 col-lg-4">
-      <article class="equipment-card h-100">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div class="card-icon-box">
-            <i class="bi bi-laptop"></i>
+  <!-- ================= MODAL: INICIO DE SESIÓN REQUERIDO ================= -->
+  <div class="modal fade" id="modalRequiereSesion" tabindex="-1" aria-labelledby="modalRequiereSesionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+        <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+          <div class="d-flex align-items-center gap-3">
+            <div class="card-icon-box">
+              <i class="bi bi-shield-lock"></i>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold" id="modalRequiereSesionLabel" style="color: #153352;">
+                Inicia sesión para continuar
+              </h5>
+              <span class="small text-muted">Acceso exclusivo para usuarios registrados</span>
+            </div>
           </div>
-          <span class="rank-pill">01 &middot; Más prestado</span>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
-        <h3 class="equipment-title">Nombre del equipo</h3>
-        <p class="equipment-specs">Especificación 1 &middot; Especificación 2</p>
-
-        <div class="mt-auto pt-2">
-          <!-- Usar .text-available (verde) o .text-unavailable (naranja/café) -->
-          <div class="availability-label text-available mb-2">8 de 12 disponibles</div>
-          <div class="availability-track mb-4">
-            <div class="availability-fill" style="width: 66%;"></div>
-          </div>
-          <!-- Usar .btn-card-loan si hay stock o .btn-card-alt si está agotado -->
-          <a href="#" class="btn btn-card-loan w-100">Solicitar préstamo</a>
+        <div class="modal-body px-4 py-3">
+          <p class="mb-0" style="color: #3d5d80; font-size: 0.94rem;" id="mensajeModalSesion">
+            Para solicitar préstamos de equipos o servicios tecnológicos necesitas iniciar sesión con tu cuenta. Si aún no tienes una, puedes crearla en segundos.
+          </p>
         </div>
-      </article>
+
+        <div class="modal-footer border-top-0 px-4 pb-4 pt-2 d-flex flex-column flex-sm-row gap-2">
+          <a href="registro.php" class="btn btn-capsule-outline flex-fill text-center">
+            Crear una cuenta
+          </a>
+          <a href="login.php?redirect=index.php" class="btn btn-capsule-primary flex-fill text-center">
+            Iniciar sesión
+          </a>
+        </div>
+      </div>
     </div>
-  </template>
-
-  <!-- Plantilla 2: Tarjeta de Servicio Popular -->
-  <template id="tpl-servicio-popular">
-    <div class="col-sm-6 col-lg-3">
-      <article class="service-card h-100">
-        <div class="card-icon-box mb-4">
-          <i class="bi bi-wrench"></i>
-        </div>
-
-        <h3 class="service-title">Nombre del servicio</h3>
-        <p class="service-description">Descripción breve del servicio tecnológico.</p>
-
-        <a href="#" class="service-link mt-auto">
-          Solicitar servicio <i class="bi bi-arrow-right ms-1"></i>
-        </a>
-      </article>
-    </div>
-  </template>
+  </div>
 
   <!-- Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const modalSesion = document.getElementById('modalRequiereSesion');
+    if (modalSesion) {
+      modalSesion.addEventListener('show.bs.modal', event => {
+        const trigger = event.relatedTarget;
+        const accion = trigger ? trigger.getAttribute('data-accion') : null;
+        const texto = document.getElementById('mensajeModalSesion');
+        if (accion && texto) {
+          texto.textContent = `Para ${accion} necesitas iniciar sesión con tu cuenta. Si aún no tienes una, puedes registrarte ahora mismo.`;
+        }
+      });
+    }
+  </script>
 </body>
 </html>

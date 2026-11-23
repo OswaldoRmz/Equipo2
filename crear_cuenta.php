@@ -1,3 +1,74 @@
+<?php
+require_once 'config/conexion.php';
+
+if (estaLogueado()) {
+    header('Location: index.php');
+    exit;
+}
+
+$errores = [];
+$valores = [
+    'nombre'           => '',
+    'apellidoPaterno'  => '',
+    'apellidoMaterno'  => '',
+    'correo'           => '',
+    'telefono'         => '',
+];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $valores['nombre']          = trim($_POST['nombre'] ?? '');
+    $valores['apellidoPaterno'] = trim($_POST['apellidoPaterno'] ?? '');
+    $valores['apellidoMaterno'] = trim($_POST['apellidoMaterno'] ?? '');
+    $valores['correo']          = trim($_POST['correo'] ?? '');
+    $valores['telefono']        = trim($_POST['telefono'] ?? '');
+    $password                   = $_POST['password'] ?? '';
+    $confirmPassword            = $_POST['confirmPassword'] ?? '';
+
+    if ($valores['nombre'] === '' || $valores['apellidoPaterno'] === '') {
+        $errores[] = 'El nombre y al menos el apellido paterno son obligatorios.';
+    }
+    if (!filter_var($valores['correo'], FILTER_VALIDATE_EMAIL)) {
+        $errores[] = 'Ingresa un correo electrónico válido.';
+    }
+    if ($valores['telefono'] === '' || strlen($valores['telefono']) > 15) {
+        $errores[] = 'Ingresa un número de teléfono válido (máximo 15 caracteres).';
+    }
+    if (strlen($password) < 6) {
+        $errores[] = 'La contraseña debe tener al menos 6 caracteres.';
+    }
+    if ($password !== $confirmPassword) {
+        $errores[] = 'Las contraseñas no coinciden.';
+    }
+
+    if (empty($errores)) {
+        // Verificar si el correo ya está registrado en la tabla usuario
+        $stmtCheck = $pdo->prepare("SELECT id_usuario FROM usuario WHERE correo = :correo LIMIT 1");
+        $stmtCheck->execute([':correo' => $valores['correo']]);
+
+        if ($stmtCheck->fetch()) {
+            $errores[] = 'Este correo electrónico ya está registrado. Intenta iniciar sesión.';
+        } else {
+            $apellidosCompletos = trim($valores['apellidoPaterno'] . ' ' . $valores['apellidoMaterno']);
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+            $stmtInsert = $pdo->prepare("
+                INSERT INTO usuario (nombres, apellidos, telefono, correo, password_hash, id_rol, estado)
+                VALUES (:nombres, :apellidos, :telefono, :correo, :password_hash, 3, 'Activo')
+            ");
+            $stmtInsert->execute([
+                ':nombres'       => $valores['nombre'],
+                ':apellidos'     => $apellidosCompletos,
+                ':telefono'      => $valores['telefono'],
+                ':correo'        => $valores['correo'],
+                ':password_hash' => $passwordHash,
+            ]);
+
+            header('Location: login.php?registrado=1');
+            exit;
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,7 +88,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 
   <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="styles/styleCrearCuenta.css" />
+  <link rel="stylesheet" href="styles/StyleCrearCuenta.css" />
 </head>
 <body>
 
@@ -26,22 +97,20 @@
 
       <!-- ================= COLUMNA IZQUIERDA ================= -->
       <aside class="col-lg-5 left-panel">
-        <!-- Marca / Logo -->
-        <div class="d-flex align-items-center gap-3">
-          <svg width="54" height="54" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Capsule Tech">
-            <rect width="64" height="64" rx="14" fill="#090C10" />
-            <circle cx="32" cy="31" r="24" stroke="#FFFFFF" stroke-width="2" />
-            <path d="M43.5 23.5C41.2 19.6 36.9 17 32 17C24.3 17 18 23.3 18 31C18 38.7 24.3 45 32 45C36.9 45 41.2 42.4 43.5 38.5L37.5 35C36.3 36.8 34.3 38 32 38C28.1 38 25 34.9 25 31C25 27.1 28.1 24 32 24C34.3 24 36.3 25.2 37.5 27L43.5 23.5Z" fill="#FFFFFF" />
-            <circle cx="32" cy="31" r="4.5" stroke="#FFFFFF" stroke-width="2.2" />
-            <rect x="11" y="47" width="42" height="8" rx="4" fill="#090C10" stroke="#FFFFFF" stroke-width="1.5" />
-            <text x="32" y="52.6" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="4.6" font-weight="700" text-anchor="middle" letter-spacing="0.4">CAPSULE CORP</text>
-          </svg>
-
+        <!-- Marca / Logo oficial -->
+        <a href="index.php" class="d-flex align-items-center gap-3 text-decoration-none">
+          <img
+            src="images/logo.jpeg"
+            alt="Logo oficial Capsule Tech"
+            width="54"
+            height="54"
+            style="border-radius: 14px; object-fit: cover;"
+          />
           <div>
             <div class="brand-title">Capsule Tech</div>
             <div class="brand-subtitle">Servicios Tecnológicos</div>
           </div>
-        </div>
+        </a>
 
         <!-- Mensaje principal -->
         <div class="my-4">
@@ -119,8 +188,10 @@
       <main class="col-lg-7 right-panel">
         <!-- Barra superior -->
         <header class="top-nav-bar">
-          <span class="portal-label">Portal de Servicios</span>
-          <a href="#" class="help-link">¿Necesitas ayuda?</a>
+          <a href="index.php" class="portal-label text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> Volver al inicio
+          </a>
+          <a href="index.php#footer-institucional" class="help-link">¿Necesitas ayuda?</a>
         </header>
 
         <!-- Formulario -->
@@ -129,13 +200,31 @@
           <h2 class="form-title">Crea tu cuenta</h2>
           <p class="form-subtitle">Tus servicios tecnológicos comienzan aquí.</p>
 
-          <form action="#" method="POST" novalidate>
+          <?php if (!empty($errores)): ?>
+            <div class="alert alert-danger py-2 px-3 small" role="alert">
+              <ul class="mb-0 ps-3">
+                <?php foreach ($errores as $err): ?>
+                  <li><?= htmlspecialchars($err) ?></li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+          <?php endif; ?>
+
+          <form action="crear_cuenta.php" method="POST" novalidate>
             <!-- Nombre -->
             <div class="mb-3">
               <label for="nombre" class="form-label">Nombre</label>
               <div class="input-icon-group">
                 <span class="input-icon-left"><i class="bi bi-person"></i></span>
-                <input type="text" class="form-control custom-input" id="nombre" placeholder="Ingresa tu nombre" required />
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  id="nombre"
+                  name="nombre"
+                  value="<?= htmlspecialchars($valores['nombre']) ?>"
+                  placeholder="Ingresa tu nombre"
+                  required
+                />
               </div>
             </div>
 
@@ -145,14 +234,29 @@
                 <label for="apellidoPaterno" class="form-label">Apellido paterno</label>
                 <div class="input-icon-group">
                   <span class="input-icon-left"><i class="bi bi-person"></i></span>
-                  <input type="text" class="form-control custom-input" id="apellidoPaterno" placeholder="Apellido paterno" required />
+                  <input
+                    type="text"
+                    class="form-control custom-input"
+                    id="apellidoPaterno"
+                    name="apellidoPaterno"
+                    value="<?= htmlspecialchars($valores['apellidoPaterno']) ?>"
+                    placeholder="Apellido paterno"
+                    required
+                  />
                 </div>
               </div>
               <div class="col-sm-6">
                 <label for="apellidoMaterno" class="form-label">Apellido materno</label>
                 <div class="input-icon-group">
                   <span class="input-icon-left"><i class="bi bi-person"></i></span>
-                  <input type="text" class="form-control custom-input" id="apellidoMaterno" placeholder="Apellido materno" required />
+                  <input
+                    type="text"
+                    class="form-control custom-input"
+                    id="apellidoMaterno"
+                    name="apellidoMaterno"
+                    value="<?= htmlspecialchars($valores['apellidoMaterno']) ?>"
+                    placeholder="Apellido materno"
+                  />
                 </div>
               </div>
             </div>
@@ -162,7 +266,33 @@
               <label for="correo" class="form-label">Correo electrónico</label>
               <div class="input-icon-group">
                 <span class="input-icon-left"><i class="bi bi-envelope"></i></span>
-                <input type="email" class="form-control custom-input" id="correo" placeholder="tu.correo@institucion.edu" required />
+                <input
+                  type="email"
+                  class="form-control custom-input"
+                  id="correo"
+                  name="correo"
+                  value="<?= htmlspecialchars($valores['correo']) ?>"
+                  placeholder="tu.correo@institucion.edu"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Teléfono (columna NOT NULL en tabla usuario) -->
+            <div class="mb-3">
+              <label for="telefono" class="form-label">Teléfono</label>
+              <div class="input-icon-group">
+                <span class="input-icon-left"><i class="bi bi-telephone"></i></span>
+                <input
+                  type="tel"
+                  class="form-control custom-input"
+                  id="telefono"
+                  name="telefono"
+                  maxlength="15"
+                  value="<?= htmlspecialchars($valores['telefono']) ?>"
+                  placeholder="Ej. 7712345678"
+                  required
+                />
               </div>
             </div>
 
@@ -171,7 +301,14 @@
               <label for="password" class="form-label">Contraseña</label>
               <div class="input-icon-group">
                 <span class="input-icon-left"><i class="bi bi-lock"></i></span>
-                <input type="password" class="form-control custom-input has-right-icon" id="password" placeholder="Crea una contraseña" required />
+                <input
+                  type="password"
+                  class="form-control custom-input has-right-icon"
+                  id="password"
+                  name="password"
+                  placeholder="Crea una contraseña"
+                  required
+                />
                 <button type="button" class="toggle-password-btn" data-target="password" aria-label="Mostrar u ocultar contraseña">
                   <i class="bi bi-eye"></i>
                 </button>
@@ -179,23 +316,14 @@
             </div>
 
             <!-- Confirmar contraseña -->
-            <div class="mb-3">
+            <div class="mb-4">
               <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
               <div class="input-icon-group">
                 <span class="input-icon-left"><i class="bi bi-lock"></i></span>
-                <input type="password" class="form-control custom-input has-right-icon" id="confirmPassword" placeholder="Repite tu contraseña" required />
+                <input type="password" class="form-control custom-input has-right-icon" id="confirmPassword"name="confirmPassword"placeholder="Repite tu contraseña"required/>
                 <button type="button" class="toggle-password-btn" data-target="confirmPassword" aria-label="Mostrar u ocultar confirmación de contraseña">
                   <i class="bi bi-eye"></i>
                 </button>
-              </div>
-            </div>
-
-            <!-- Usuario -->
-            <div class="mb-4">
-              <label for="usuario" class="form-label">Usuario</label>
-              <div class="input-icon-group">
-                <span class="input-icon-left"><i class="bi bi-person-vcard"></i></span>
-                <input type="text" class="form-control custom-input" id="usuario" placeholder="Ej. ana.lopez" required />
               </div>
             </div>
 
@@ -206,7 +334,7 @@
 
             <!-- Iniciar sesión -->
             <p class="text-center login-prompt mb-0">
-              ¿Ya tienes cuenta? <a href="#" class="login-link">Inicia sesión</a>
+              ¿Ya tienes cuenta? <a href="login.php" class="login-link">Inicia sesión</a>
             </p>
           </form>
         </section>
@@ -225,7 +353,6 @@
     </div>
   </div>
 
-  <!-- Script para alternar visibilidad de contraseñas -->
   <script>
     document.querySelectorAll('.toggle-password-btn').forEach(button => {
       button.addEventListener('click', () => {
