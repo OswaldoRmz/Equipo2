@@ -1,0 +1,518 @@
+:root {
+  --bg-page: #ffffff;
+  --bg-hero: #dcebfc;
+  --bg-tinted: #f5f9fe;
+  --bg-footer: #edf5fd;
+
+  --border-subtle: #e2edf8;
+  --border-card: #d5e4f5;
+  --border-input: #b4cbe3;
+
+  --navy-dark: #153352;
+  --navy-medium: #3d5d80;
+  --navy-muted: #5a7796;
+  --accent-blue: #235789;
+
+  --btn-primary-bg: #9cc3eb;
+  --btn-primary-hover: #87b5e5;
+
+  --status-available: #145c3c;
+  --status-unavailable: #9c4a1a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--navy-dark);
+  background-color: var(--bg-page);
+  margin: 0;
+}
+
+.text-navy {
+  color: var(--navy-dark);
+}
+
+/* ================= NAVBAR ================= */
+.main-navbar {
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.brand-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(13, 71, 161, 0.14);
+}
+
+.brand-logo-sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+.brand-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.brand-subtitle {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--navy-medium);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.nav-pill-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--navy-dark);
+  padding: 0.48rem 1.05rem !important;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-pill-link:hover {
+  background-color: #eef5fd;
+  color: var(--accent-blue);
+}
+
+.nav-pill-link.active {
+  background-color: var(--bg-hero);
+  color: var(--navy-dark);
+  font-weight: 600;
+}
+
+/* ================= TÍTULO Y BUSCADOR ================= */
+.page-title {
+  font-size: clamp(1.85rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: var(--navy-dark);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.page-subtitle {
+  font-size: 0.98rem;
+  color: var(--navy-medium);
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--navy-medium);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.search-input {
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--border-input);
+  padding-left: 2.75rem;
+  font-size: 0.94rem;
+  color: var(--navy-dark);
+  background-color: #ffffff;
+}
+
+.search-input::placeholder {
+  color: var(--navy-muted);
+}
+
+.search-input:focus {
+  border-color: #5b9bd5;
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.18);
+  outline: none;
+}
+
+/* ================= FILTROS PILL ================= */
+.filter-group-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.filter-pill {
+  background-color: #ffffff;
+  color: var(--navy-dark);
+  border: 1px solid #c6daef;
+  border-radius: 999px;
+  padding: 0.42rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.filter-pill:hover {
+  background-color: #f1f7fe;
+  border-color: #93bce4;
+}
+
+.filter-pill.active {
+  background-color: var(--btn-primary-bg);
+  border-color: var(--btn-primary-bg);
+  color: var(--navy-dark);
+  font-weight: 600;
+}
+
+/* ================= PLACEHOLDERS PREPARADOS PARA BD ================= */
+.db-card-placeholder {
+  min-height: 295px;
+  border: 1.5px dashed #b9d2ec;
+  background-color: #f9fcff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--navy-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.db-loan-placeholder {
+  min-height: 155px;
+  border: 1.5px dashed #b9d2ec;
+  background-color: #f9fcff;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--navy-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.footer-db-placeholder {
+  min-height: 110px;
+  border: 1.5px dashed #b9d2ec;
+  background-color: rgba(255, 255, 255, 0.55);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  color: var(--navy-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* ================= TARJETAS DE EQUIPO (LISTAS PARA BD) ================= */
+.equipment-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: 16px;
+  padding: 1.45rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.equipment-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(21, 51, 82, 0.06);
+}
+
+.card-icon-box {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  background-color: #e4f0fd;
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.category-pill {
+  background-color: #eef5fd;
+  color: var(--navy-medium);
+  font-size: 0.76rem;
+  font-weight: 500;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+}
+
+.equipment-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  line-height: 1.3;
+  margin-bottom: 0.35rem;
+}
+
+.equipment-specs {
+  font-size: 0.85rem;
+  color: var(--navy-medium);
+  margin-bottom: 1.25rem;
+}
+
+.availability-label {
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.text-available {
+  color: var(--status-available);
+}
+
+.text-unavailable {
+  color: var(--status-unavailable);
+}
+
+.availability-track {
+  width: 100%;
+  height: 5px;
+  background-color: #e4eef9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.availability-fill {
+  height: 100%;
+  background-color: #5b9bd5;
+  border-radius: 999px;
+}
+
+.btn-card-loan {
+  background-color: var(--btn-primary-bg);
+  color: var(--navy-dark);
+  font-weight: 600;
+  font-size: 0.88rem;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.btn-card-loan:hover {
+  background-color: var(--btn-primary-hover);
+  color: var(--navy-dark);
+}
+
+.btn-card-alt {
+  background-color: #ffffff;
+  color: var(--navy-dark);
+  font-weight: 600;
+  font-size: 0.88rem;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid var(--border-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-card-alt:hover {
+  background-color: #f4f9ff;
+  color: var(--navy-dark);
+}
+
+/* ================= PAGINACIÓN ================= */
+.pagination-summary {
+  font-size: 0.86rem;
+  color: var(--navy-medium);
+}
+
+.pagination-btn {
+  background-color: #ffffff;
+  border: 1px solid var(--border-card);
+  color: var(--navy-dark);
+  font-size: 0.84rem;
+  font-weight: 500;
+  padding: 0.45rem 0.95rem;
+  border-radius: 8px;
+}
+
+.pagination-btn:hover {
+  background-color: #f2f7fd;
+  border-color: #b4cbe3;
+  color: var(--navy-dark);
+}
+
+.pagination-btn.active {
+  background-color: var(--bg-hero);
+  border-color: var(--bg-hero);
+  font-weight: 600;
+}
+
+/* ================= SECCIÓN REGLAS DE PRÉSTAMO ================= */
+.section-tinted {
+  background-color: var(--bg-tinted);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.section-title {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  letter-spacing: -0.02em;
+}
+
+.rule-icon-box {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 10px;
+  background-color: #e4f0fd;
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.rule-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 0.25rem;
+}
+
+.rule-text {
+  font-size: 0.88rem;
+  color: var(--navy-medium);
+}
+
+/* ================= MIS PRÉSTAMOS ACTIVOS ================= */
+.cutoff-date-badge {
+  font-size: 0.82rem;
+  color: var(--navy-muted);
+}
+
+.active-loan-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: 16px;
+  padding: 1.45rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.loan-equipment-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 0.15rem;
+}
+
+.loan-folio {
+  font-size: 0.82rem;
+  color: var(--navy-medium);
+}
+
+.loan-date-label {
+  font-size: 0.78rem;
+  color: var(--navy-medium);
+  margin-bottom: 0.2rem;
+}
+
+.loan-date-value {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+}
+
+.days-pill {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 1.25rem;
+  border-radius: 999px;
+}
+
+.days-pill-normal {
+  background-color: #e4f0fd;
+  color: var(--accent-blue);
+}
+
+.days-pill-warning {
+  background-color: #fbead1;
+  color: #8c4a19;
+}
+
+/* ================= FOOTER ================= */
+.main-footer {
+  background-color: var(--bg-footer);
+  border-top: 1px solid var(--border-card);
+}
+
+.footer-brand-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  letter-spacing: -0.02em;
+}
+
+.footer-lead {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  line-height: 1.35;
+}
+
+.footer-heading {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 0.85rem;
+}
+
+.footer-text {
+  font-size: 0.88rem;
+  color: var(--navy-medium);
+  line-height: 1.6;
+}
+
+.footer-action-link {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+.footer-action-link:hover {
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--border-card);
+  font-size: 0.8rem;
+  color: var(--navy-muted);
+}
+
+.footer-bottom a {
+  color: var(--navy-muted);
+  text-decoration: none;
+}
+
+.footer-bottom a:hover {
+  color: var(--navy-dark);
+  text-decoration: underline;
+}
