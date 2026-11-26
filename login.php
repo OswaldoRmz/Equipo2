@@ -12,7 +12,7 @@ $correoPrevio = '';
 $redirect = $_GET['redirect'] ?? $_POST['redirect'] ?? 'index.php';
 
 // Validar que el redirect sea una ruta interna segura
-$rutasPermitidas = ['index.php', 'inventario.php'];
+$rutasPermitidas = ['index.php', 'inventario.php', 'servicios.php', 'mis_solicitudes.php'];
 if (!in_array($redirect, $rutasPermitidas, true)) {
     $redirect = 'index.php';
 }

@@ -1,0 +1,1177 @@
+/* =====================================================================
+   servicios.css — Estilos propios de la página de Servicios.
+   Se carga DESPUÉS de inventario.css, que ya aporta las variables de color,
+   el navbar, el buscador, los filtros, las tarjetas, los botones y el footer.
+   ===================================================================== */
+
+.min-w-0 {
+  min-width: 0;
+}
+
+/* ================= TARJETAS DEL CATÁLOGO ================= */
+.service-price {
+  font-size: 0.88rem;
+  color: var(--navy-medium);
+  margin-bottom: 0.9rem;
+}
+
+.service-price strong {
+  color: var(--navy-dark);
+  font-weight: 600;
+}
+
+/* ================= ¿CÓMO FUNCIONA? ================= */
+.how-steps {
+  position: relative;
+}
+
+/* Línea que une el centro del primer y del último paso */
+.how-steps-line {
+  position: absolute;
+  top: 15px;
+  left: 16.666%;
+  right: 16.666%;
+  height: 2px;
+  background-color: #c6d9f1;
+}
+
+.how-step-circle {
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #d4e5fc;
+  color: var(--accent-blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.how-step-circle.is-final {
+  background-color: #416898;
+  color: #ffffff;
+}
+
+.how-step-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin: 0.85rem 0 0.35rem;
+}
+
+.how-step-text {
+  font-size: 0.9rem;
+  color: var(--navy-medium);
+  max-width: 310px;
+  margin: 0 auto;
+}
+
+/* ================= MIS SOLICITUDES ================= */
+.btn-ver-todas {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+
+.btn-ver-todas:hover {
+  text-decoration: underline;
+}
+
+.request-row {
+  background-color: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 1rem 1.4rem;
+}
+
+.request-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 0.2rem;
+}
+
+.request-meta {
+  font-size: 0.86rem;
+  color: var(--navy-medium);
+}
+
+.request-meta a {
+  color: var(--accent-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.request-meta a:hover {
+  text-decoration: underline;
+}
+
+.status-pill {
+  display: inline-block;
+  min-width: 140px;
+  padding: 0.4rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+@media (min-width: 768px) {
+  .status-pill {
+    align-self: center;
+  }
+}
+
+.status-pill-recibido {
+  background-color: #eaf2ff;
+  color: #284d80;
+}
+
+.status-pill-proceso {
+  background-color: #fff2d9;
+  color: #76511a;
+}
+
+.status-pill-listo {
+  background-color: #e3f4ea;
+  color: var(--status-available);
+}
+
+.status-pill-cancelado {
+  background-color: #f1f3f6;
+  color: var(--navy-muted);
+}
+
+/* ================= AYUDA Y CONTACTO ================= */
+.help-banner {
+  background-color: var(--bg-hero);
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+}
+
+.help-banner-title {
+  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+  font-weight: 700;
+  color: var(--navy-dark);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.help-banner-text {
+  font-size: 0.98rem;
+  color: var(--navy-medium);
+}
+
+.help-banner-btn {
+  min-width: 200px;
+  height: 46px;
+  font-size: 0.95rem;
+}
+
+/* ================= MODAL: SOLICITAR SERVICIO ================= */
+.modal-servicio .modal-dialog {
+  max-width: 640px;
+}
+
+.service-modal {
+  border-radius: 16px;
+}
+
+.service-modal-header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1.6rem 1.75rem 1.1rem;
+}
+
+.service-modal-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.service-modal-subtitle {
+  font-size: 0.94rem;
+  color: var(--navy-medium);
+}
+
+.service-modal-body {
+  padding: 1.25rem 1.75rem 1rem;
+}
+
+.service-modal-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 1rem 1.75rem 1.4rem;
+  flex-wrap: nowrap;
+  gap: 0.75rem;
+}
+
+.service-modal-footer > * {
+  margin: 0;
+}
+
+.modal-btn-cancel {
+  flex: 1;
+  height: 46px;
+}
+
+.modal-btn-submit {
+  flex: 2;
+  height: 46px;
+}
+
+.service-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.service-input {
+  background-color: #f7faff;
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  min-height: 46px;
+  font-size: 0.94rem;
+  color: var(--navy-dark);
+}
+
+.service-input::placeholder {
+  color: var(--navy-muted);
+}
+
+.service-input:focus {
+  background-color: #ffffff;
+  border-color: #5b9bd5;
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.18);
+}
+
+textarea.service-input {
+  resize: vertical;
+}
+
+.service-help,
+.form-counter {
+  font-size: 0.78rem;
+  color: var(--navy-muted);
+}
+
+.form-counter {
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+/* Zona para adjuntar archivo (input oculto + etiqueta clicable) */
+.file-input-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.file-drop {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  border: 1.5px dashed #b9d2ec;
+  border-radius: 12px;
+  background-color: #fbfdff;
+  padding: 1rem 1.15rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.file-drop:hover,
+.file-drop.is-dragover {
+  background-color: #f1f7fe;
+  border-color: #5b9bd5;
+}
+
+.file-input-hidden:focus-visible + .file-drop {
+  border-color: #5b9bd5;
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.25);
+}
+
+.file-input-hidden.is-valid + .file-drop {
+  border-style: solid;
+  border-color: var(--bs-form-valid-border-color);
+}
+
+.file-input-hidden.is-invalid + .file-drop {
+  border-color: var(--bs-form-invalid-border-color);
+}
+
+.file-drop-icon {
+  font-size: 1.25rem;
+  color: var(--accent-blue);
+}
+
+.file-drop-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-drop-hint {
+  font-size: 0.78rem;
+  color: var(--navy-muted);
+}
+
+.file-remove-btn {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--status-unavailable);
+  text-decoration: none;
+  padding: 0.35rem 0 0;
+}
+
+.file-remove-btn:hover {
+  color: #7a3612;
+  text-decoration: underline;
+}
+
+/* Selector de prioridad (radios de Bootstrap con estilo de botón) */
+.priority-option {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-input);
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: var(--navy-dark);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.priority-option:hover {
+  background-color: #f4f9ff;
+  border-color: #93bce4;
+  color: var(--navy-dark);
+}
+
+.btn-check:checked + .priority-option {
+  background-color: var(--bg-hero);
+  border-color: var(--btn-primary-bg);
+  color: var(--navy-dark);
+  font-weight: 600;
+}
+
+.btn-check:focus-visible + .priority-option {
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.25);
+}
+
+.priority-group.is-invalid .priority-option {
+  border-color: var(--bs-form-invalid-border-color);
+}
+
+.priority-hint {
+  font-size: 0.8rem;
+  color: var(--navy-muted);
+  margin-top: 0.6rem;
+}
+
+@media (max-width: 575.98px) {
+  .service-modal-header,
+  .service-modal-body,
+  .service-modal-footer {
+    padding-left: 1.15rem;
+    padding-right: 1.15rem;
+  }
+
+  .help-banner {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+/* =====================================================================
+   VISTA DE ADMINISTRADOR (Gestión de servicios)
+   ===================================================================== */
+
+/* Navbar: insignia de rol y avatar con iniciales */
+.role-pill {
+  background-color: #ebf3ff;
+  color: var(--navy-dark);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.5rem 1.4rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.avatar-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--bg-hero);
+  color: var(--navy-dark);
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  margin-left: 0.75rem;
+  transition: box-shadow 0.15s ease;
+}
+
+.avatar-initials:hover,
+.avatar-initials:focus-visible {
+  color: var(--navy-dark);
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.3);
+}
+
+.admin-primary-btn {
+  height: 48px;
+  min-width: 210px;
+  font-size: 0.95rem;
+}
+
+/* Tarjetas de resumen */
+.admin-stat-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 1rem 1.2rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.admin-stat-card.is-highlighted {
+  background-color: #ebf3ff;
+}
+
+.admin-stat-label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--navy-medium);
+}
+
+.admin-stat-value {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 600;
+  color: var(--navy-dark);
+  line-height: 1.2;
+}
+
+/* Pestañas Solicitudes / Catálogo */
+.admin-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border-card);
+  overflow-x: auto;
+}
+
+.admin-tab {
+  position: relative;
+  padding: 0.9rem 2.2rem;
+  border-radius: 8px 8px 0 0;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: var(--navy-medium);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.admin-tab:hover {
+  background-color: #f4f9ff;
+  color: var(--navy-dark);
+}
+
+.admin-tab.active {
+  background-color: #ebf3ff;
+  color: var(--navy-dark);
+  font-weight: 600;
+}
+
+/* Pestañas que son <button> (cambian de sección sin recargar, ej. Mis solicitudes) */
+button.admin-tab {
+  border: 0;
+  background-color: transparent;
+}
+
+.tab-count {
+  display: inline-block;
+  min-width: 1.6rem;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background-color: #dceafe;
+  color: var(--navy-dark);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* En celular, las dos pestañas de Mis solicitudes ocupan el mismo ancho y caben completas */
+@media (max-width: 575.98px) {
+  .admin-tabs[role="tablist"] {
+    gap: 0.25rem;
+  }
+
+  .admin-tabs[role="tablist"] .admin-tab {
+    flex: 1 1 0;
+    padding: 0.8rem 0.4rem;
+    font-size: 0.92rem;
+    text-align: center;
+  }
+}
+
+.tab-subtitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 1rem;
+}
+
+.tab-intro {
+  font-size: 0.94rem;
+  color: var(--navy-medium);
+  margin: 1.5rem 0 1.25rem;
+}
+
+.admin-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background-color: #416898;
+  border-radius: 3px 3px 0 0;
+}
+
+/* Filtros */
+.admin-filter-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--navy-dark);
+  margin-bottom: 0.45rem;
+}
+
+.admin-select {
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--border-input);
+  font-size: 0.94rem;
+  color: var(--navy-dark);
+}
+
+.admin-select:focus {
+  border-color: #5b9bd5;
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.18);
+}
+
+/* Tablas */
+.admin-table-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.admin-table {
+  --bs-table-bg: transparent;
+  min-width: 980px;
+  font-size: 0.88rem;
+  color: var(--navy-dark);
+}
+
+.catalog-table {
+  min-width: 720px;
+}
+
+.admin-table thead th {
+  background-color: #f3f7fd;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+  padding: 1rem 0.55rem;
+  border-bottom: 1px solid var(--border-card);
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 0.85rem 0.55rem;
+  border-bottom: 1px solid var(--border-card);
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover,
+.admin-table tbody tr.is-selected {
+  background-color: #f6faff;
+}
+
+.admin-folio {
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.admin-cell-muted {
+  color: var(--navy-medium);
+}
+
+.admin-cell-email {
+  max-width: 160px;
+}
+
+.admin-empty {
+  color: var(--navy-muted);
+  font-size: 0.92rem;
+}
+
+.status-pill-sm {
+  min-width: 112px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.78rem;
+}
+
+/* Botones de acción de la tabla (icono + texto) */
+.table-action {
+  background: none;
+  border: 0;
+  padding: 0.1rem 0;
+  width: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--navy-medium);
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.table-action-icon {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-card);
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: var(--navy-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.table-action:hover .table-action-icon,
+.table-action:focus-visible .table-action-icon {
+  background-color: #ebf3ff;
+  border-color: #93bce4;
+}
+
+.table-action:focus-visible {
+  outline: none;
+}
+
+/* Catálogo */
+.catalog-cell-main {
+  min-width: 320px;
+}
+
+.catalog-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+  margin-bottom: 0.2rem;
+}
+
+.catalog-desc {
+  font-size: 0.9rem;
+  color: var(--navy-medium);
+}
+
+.catalog-meta {
+  font-size: 0.8rem;
+  color: var(--navy-muted);
+  margin-top: 0.25rem;
+}
+
+.availability-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-left: 0;
+}
+
+.availability-switch .form-check-input {
+  width: 2.75rem;
+  height: 1.5rem;
+  margin: 0;
+  cursor: pointer;
+  border-color: #ccd5e0;
+  background-color: #ccd5e0;
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+.availability-switch .form-check-input:checked {
+  background-color: #416898;
+  border-color: #416898;
+}
+
+.availability-switch .form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(65, 104, 152, 0.25);
+}
+
+.availability-switch .form-check-label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--navy-dark);
+  cursor: pointer;
+}
+
+.availability-switch .form-check-label.is-off {
+  color: var(--navy-medium);
+}
+
+.btn-table {
+  height: 40px;
+  min-width: 84px;
+  padding: 0 1rem;
+  border: 1px solid var(--border-card);
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: var(--navy-dark);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.btn-table:hover {
+  background-color: #f4f9ff;
+  border-color: #93bce4;
+  color: var(--navy-dark);
+}
+
+.btn-table-danger {
+  color: #943d48;
+}
+
+.btn-table-danger:hover {
+  background-color: #fdf2f3;
+  border-color: #e6b8be;
+  color: #7d2f39;
+}
+
+/* Botón principal deshabilitado: conserva su color, más tenue */
+.btn-card-loan:disabled,
+.btn-card-loan.disabled {
+  background-color: var(--btn-primary-bg);
+  color: var(--navy-dark);
+  opacity: 0.5;
+}
+
+.btn-danger-soft {
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #e6b8be;
+  background-color: #fdf2f3;
+  color: #943d48;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.btn-danger-soft:hover {
+  background-color: #f9e1e4;
+  color: #7d2f39;
+}
+
+.icon-box-danger {
+  background-color: #fdf2f3;
+  color: #943d48;
+}
+
+.service-input-addon {
+  background-color: #eef4fb;
+  border: 1px solid var(--border-card);
+  border-radius: 10px 0 0 10px;
+  color: var(--navy-medium);
+  font-weight: 600;
+}
+
+/* Panel lateral "Detalle de solicitud" */
+.panel-solicitud {
+  --bs-offcanvas-width: 560px;
+  box-shadow: -8px 0 24px rgba(15, 33, 59, 0.15);
+}
+
+.panel-solicitud ~ .offcanvas-backdrop,
+.offcanvas-backdrop.show {
+  opacity: 0.24;
+  background-color: #122641;
+}
+
+.panel-header {
+  padding: 1.75rem 2rem 1.1rem;
+  border-bottom: 1px solid var(--border-card);
+}
+
+.panel-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.panel-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-card);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy-dark);
+  flex-shrink: 0;
+}
+
+.panel-close:hover {
+  background-color: #f4f9ff;
+}
+
+.panel-subtitle {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--navy-medium);
+}
+
+.panel-body {
+  padding: 1.25rem 2rem 1.5rem;
+  overflow-y: auto;
+}
+
+.panel-section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+  margin-bottom: 0.55rem;
+}
+
+.panel-name {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.panel-muted {
+  font-size: 0.92rem;
+  color: var(--navy-medium);
+  word-break: break-word;
+}
+
+.panel-data {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  row-gap: 0.45rem;
+  margin: 0;
+}
+
+.panel-data dt {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--navy-dark);
+  padding-top: 0.12rem;
+}
+
+.panel-data dd {
+  font-size: 0.92rem;
+  color: var(--navy-dark);
+  margin: 0;
+  word-break: break-word;
+}
+
+.panel-data dd a {
+  color: var(--accent-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.panel-data dd a:hover {
+  text-decoration: underline;
+}
+
+.panel-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--navy-medium);
+}
+
+.panel-service {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.panel-problem {
+  background-color: #f7faff;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  color: var(--navy-medium);
+  line-height: 1.5;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.panel-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.1rem 2rem 1.4rem;
+  border-top: 1px solid var(--border-card);
+  background-color: #ffffff;
+}
+
+@media (max-width: 575.98px) {
+  .panel-header,
+  .panel-body,
+  .panel-footer {
+    padding-left: 1.15rem;
+    padding-right: 1.15rem;
+  }
+
+  .admin-primary-btn {
+    width: 100%;
+  }
+
+  .avatar-initials {
+    margin-left: 0;
+  }
+}
+
+/* =====================================================================
+   VISTA DE ADMINISTRADOR · Control de inventario (inventario.php)
+   Reutiliza las tarjetas, pestañas, filtros, tablas, modales y el panel
+   lateral de la gestión de servicios. Aquí solo va lo propio del inventario.
+   ===================================================================== */
+
+/* Botón secundario del encabezado ("Exportar") */
+.admin-secondary-btn {
+  height: 48px;
+  min-width: 140px;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+/* Avisos: préstamos vencidos y solicitudes por entregar */
+.inventory-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
+  min-height: 56px;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.inventory-alert-danger {
+  background-color: #fff0f1;
+  border-color: #e9bac1;
+  color: #873d48;
+}
+
+.inventory-alert-danger:hover {
+  background-color: #ffe6e9;
+  color: #873d48;
+}
+
+.inventory-alert-info {
+  background-color: #eaf2ff;
+  border-color: #c6daef;
+  color: #284d80;
+}
+
+.inventory-alert-info:hover {
+  background-color: #dfeafc;
+  color: #284d80;
+}
+
+.inventory-alert-icon {
+  font-size: 1.3rem;
+}
+
+.inventory-alert-title {
+  font-size: 1.08rem;
+}
+
+.inventory-alert-link {
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+/* Estado "Vencido" y filas de préstamos vencidos */
+.status-pill-vencido {
+  background-color: #fbe1e5;
+  color: #8c3444;
+}
+
+.admin-table tbody tr.is-overdue {
+  background-color: #fff3f4;
+}
+
+.admin-table tbody tr.is-overdue:hover {
+  background-color: #ffecef;
+}
+
+.admin-table tbody tr.is-overdue td:first-child {
+  box-shadow: inset 3px 0 0 #bb5363;
+}
+
+.text-overdue {
+  color: #8c3444;
+}
+
+/* Celdas */
+.admin-units {
+  font-size: 0.94rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.admin-cell-actions {
+  min-width: 200px;
+}
+
+.admin-cell-notes {
+  max-width: 220px;
+}
+
+.pagination-note {
+  font-size: 0.8rem;
+  color: var(--navy-medium);
+}
+
+/* Acción "Eliminar" de la tabla */
+.table-action-danger .table-action-icon {
+  color: #943d48;
+}
+
+.table-action-danger:hover .table-action-icon,
+.table-action-danger:focus-visible .table-action-icon {
+  background-color: #fdf2f3;
+  border-color: #e6b8be;
+}
+
+/* Botones de la columna Acciones de Préstamos */
+.btn-table-block {
+  width: 100%;
+  height: 44px;
+}
+
+.btn-table-done,
+.btn-table-done:disabled {
+  background-color: #f3f6fa;
+  border-color: var(--border-card);
+  color: var(--navy-medium);
+  opacity: 1;
+}
+
+/* Modal "Agregar / Editar equipo" */
+.modal-equipo .modal-dialog {
+  max-width: 760px;
+}
+
+.file-drop-imagen {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-height: 144px;
+  background-color: #ffffff;
+}
+
+.file-drop-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--border-card);
+  border-radius: 6px;
+  background-color: #f7faff;
+  color: var(--navy-dark);
+  font-size: 0.94rem;
+  font-weight: 500;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Aviso dentro del modal "Registrar devolución" */
+.inventory-note {
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+}
+
+.inventory-note.is-late {
+  background-color: #fff0f1;
+  color: #873d48;
+}
+
+.inventory-note.is-on-time {
+  background-color: #e3f4ea;
+  color: var(--status-available);
+}
+
+/* Panel lateral "Historial del equipo" */
+.history-image {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  background-color: #f7faff;
+}
+
+.history-item {
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+}
+
+.history-folio {
+  font-size: 0.9rem;
+  color: var(--navy-dark);
+}
+
+.history-meta {
+  font-size: 0.84rem;
+  color: var(--navy-medium);
+  word-break: break-word;
+}
+
+.history-empty {
+  border: 1.5px dashed #b9d2ec;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--navy-muted);
+}
