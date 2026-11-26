@@ -45,6 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['correo']     = $user['correo'];
                 $_SESSION['id_rol']     = (int)$user['id_rol'];
 
+                // Todos entran al sitio público, también el administrador (con su rol intacto en la sesión).
+                // Su panel se abre después desde el menú de su nombre: «Panel de administración».
                 header('Location: ' . $redirect);
                 exit;
             }
