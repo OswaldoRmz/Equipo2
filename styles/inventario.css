@@ -428,6 +428,29 @@ body {
   color: var(--navy-medium);
 }
 
+.loan-details {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  row-gap: 0.35rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background-color: var(--bg-tinted);
+}
+
+.loan-details dt {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--navy-medium);
+}
+
+.loan-details dd {
+  font-size: 0.86rem;
+  color: var(--navy-dark);
+  margin: 0;
+  word-break: break-word;
+}
+
 .loan-date-label {
   font-size: 0.78rem;
   color: var(--navy-medium);

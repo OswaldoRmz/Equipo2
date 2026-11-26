@@ -97,13 +97,13 @@ $serviciosPopulares = $pdo->query($sqlServicios)->fetchAll();
               <a class="nav-link nav-pill-link active" aria-current="page" href="index.php">Inicio</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link nav-pill-link" href="#seccion-servicios">Servicios</a>
+              <a class="nav-link nav-pill-link" href="servicios.php">Servicios</a>
             </li>
             <li class="nav-item">
               <a class="nav-link nav-pill-link" href="inventario.php">Inventario</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link nav-pill-link" href="#footer-institucional">Acerca de</a>
+              <a class="nav-link nav-pill-link" href="acerca_de.php">Acerca de</a>
             </li>
 
             <?php if ($usuario): ?>
@@ -115,7 +115,8 @@ $serviciosPopulares = $pdo->query($sqlServicios)->fetchAll();
                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
                   <li><span class="dropdown-item-text small text-muted"><?= htmlspecialchars($usuario['correo']) ?></span></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="inventario.php#titulo-prestamos-activos"><i class="bi bi-laptop me-2"></i>Mis préstamos</a></li>
+                  <li><a class="dropdown-item" href="perfil.php"><i class="bi bi-person me-2"></i>Perfil</a></li>
+                  <li><a class="dropdown-item" href="mis_solicitudes.php"><i class="bi bi-clipboard-check me-2"></i>Mis solicitudes</a></li>
                   <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
                 </ul>
               </li>
@@ -290,7 +291,7 @@ $serviciosPopulares = $pdo->query($sqlServicios)->fetchAll();
             <h2 class="section-title">Servicios populares</h2>
             <p class="section-subtitle mb-0">Soluciones para que nada detenga tus ideas.</p>
           </div>
-          <a href="#seccion-servicios" class="section-action-link">
+          <a href="servicios.php" class="section-action-link">
             Ver todos los servicios <i class="bi bi-arrow-right ms-1"></i>
           </a>
         </div>
@@ -314,7 +315,7 @@ $serviciosPopulares = $pdo->query($sqlServicios)->fetchAll();
                   </p>
 
                   <?php if ($usuario): ?>
-                    <a href="#seccion-servicios" class="service-link mt-auto" onclick="alert('Servicio seleccionado: <?= htmlspecialchars(addslashes($srv['nombre'])) ?>. Próximamente módulo de órdenes.'); return false;">
+                    <a href="servicios.php?servicio=<?= (int)$srv['id_servicio'] ?>" class="service-link mt-auto">
                       Solicitar servicio <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                   <?php else: ?>
