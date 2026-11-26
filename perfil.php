@@ -35,7 +35,9 @@ if (!$usuario) {
     exit;
 }
 
-$esAdmin = (int)$usuario['id_rol'] === ROL_ADMINISTRADOR;
+// Rol real de la cuenta: el administrador usa su perfil igual que cualquier usuario y conserva
+// sus permisos; su panel (admin/dashboard.php) se abre desde el menú de su nombre.
+$esAdministrador = (int)$usuario['id_rol'] === ROL_ADMINISTRADOR;
 $seccionActiva = (($_GET['seccion'] ?? '') === 'seguridad') ? 'seguridad' : 'datos';
 
 // Mensajes guardados antes de redirigir (evita repetir una acción al recargar)
@@ -184,69 +186,67 @@ $totalSolicitudesEnCurso = 0;
 $totalServiciosCompletados = 0;
 $actividad = [];
 
-if (!$esAdmin) {
-    $stmtPrestamos = $pdo->prepare("
-        SELECT p.folio, p.estado, p.fecha_registro, p.fecha_entrega, p.fecha_devolucion, e.nombre AS equipo
-        FROM prestamo p
-        INNER JOIN equipo e ON e.id_equipo = p.id_equipo
-        WHERE p.id_cliente = :id
-    ");
-    $stmtPrestamos->execute([':id' => $cuenta['id_usuario']]);
-    $prestamos = $stmtPrestamos->fetchAll();
+$stmtPrestamos = $pdo->prepare("
+    SELECT p.folio, p.estado, p.fecha_registro, p.fecha_entrega, p.fecha_devolucion, e.nombre AS equipo
+    FROM prestamo p
+    INNER JOIN equipo e ON e.id_equipo = p.id_equipo
+    WHERE p.id_cliente = :id
+");
+$stmtPrestamos->execute([':id' => $cuenta['id_usuario']]);
+$prestamos = $stmtPrestamos->fetchAll();
 
-    $stmtServicios = $pdo->prepare("
-        SELECT o.folio, o.estado, o.fecha_ingreso, o.fecha_entrega, o.equipo_receptor, s.nombre AS servicio
-        FROM orden_servicio o
-        LEFT JOIN servicio s ON s.id_servicio = o.id_servicio
-        WHERE o.id_cliente = :id
-    ");
-    $stmtServicios->execute([':id' => $cuenta['id_usuario']]);
-    $servicios = $stmtServicios->fetchAll();
+$stmtServicios = $pdo->prepare("
+    SELECT o.folio, o.estado, o.fecha_ingreso, o.fecha_entrega, o.equipo_receptor, s.nombre AS servicio
+    FROM orden_servicio o
+    LEFT JOIN servicio s ON s.id_servicio = o.id_servicio
+    WHERE o.id_cliente = :id
+");
+$stmtServicios->execute([':id' => $cuenta['id_usuario']]);
+$servicios = $stmtServicios->fetchAll();
 
-    foreach ($prestamos as $pr) {
-        if ($pr['estado'] === 'Prestado') {
-            $totalPrestamosActivos++;
-        } elseif ($pr['estado'] === 'Pendiente') {
-            $totalSolicitudesEnCurso++;
-        }
-
-        // Cada préstamo puede generar varios movimientos: solicitado, entregado, devuelto o rechazado
-        $actividad[] = ['fecha' => $pr['fecha_registro'], 'icono' => 'bi-box-arrow-up-right', 'titulo' => 'Préstamo solicitado',
-                        'detalle' => $pr['equipo'] . ' · ' . ($pr['estado'] === 'Pendiente' ? 'Pendiente de confirmación' : 'Folio ' . $pr['folio'])];
-        if (!empty($pr['fecha_entrega'])) {
-            $actividad[] = ['fecha' => $pr['fecha_entrega'], 'icono' => 'bi-laptop', 'titulo' => 'Equipo entregado',
-                            'detalle' => $pr['equipo'] . ' · Préstamo ' . $pr['folio']];
-        }
-        if (!empty($pr['fecha_devolucion'])) {
-            $actividad[] = ['fecha' => $pr['fecha_devolucion'], 'icono' => 'bi-arrow-return-left', 'titulo' => 'Equipo devuelto',
-                            'detalle' => $pr['equipo'] . ' · Devolución completada'];
-        }
-        if ($pr['estado'] === 'Cancelado') {
-            $actividad[] = ['fecha' => $pr['fecha_registro'], 'icono' => 'bi-x-circle', 'titulo' => 'Solicitud de préstamo rechazada',
-                            'detalle' => $pr['equipo'] . ' · Folio ' . $pr['folio']];
-        }
+foreach ($prestamos as $pr) {
+    if ($pr['estado'] === 'Prestado') {
+        $totalPrestamosActivos++;
+    } elseif ($pr['estado'] === 'Pendiente') {
+        $totalSolicitudesEnCurso++;
     }
 
-    foreach ($servicios as $srv) {
-        $nombreServicio = $srv['servicio'] ?? 'Servicio general';
-        if (in_array($srv['estado'], ['Reparado', 'Entregado'], true)) {
-            $totalServiciosCompletados++;
-        } elseif ($srv['estado'] !== 'Cancelado') {
-            $totalSolicitudesEnCurso++;
-        }
-
-        $actividad[] = ['fecha' => $srv['fecha_ingreso'], 'icono' => 'bi-tools', 'titulo' => 'Servicio solicitado',
-                        'detalle' => $nombreServicio . ' · ' . $srv['equipo_receptor']];
-        if (!empty($srv['fecha_entrega']) && in_array($srv['estado'], ['Reparado', 'Entregado'], true)) {
-            $actividad[] = ['fecha' => $srv['fecha_entrega'], 'icono' => 'bi-check2-circle', 'titulo' => 'Servicio resuelto',
-                            'detalle' => $nombreServicio . ' · ' . $srv['estado']];
-        }
+    // Cada préstamo puede generar varios movimientos: solicitado, entregado, devuelto o rechazado
+    $actividad[] = ['fecha' => $pr['fecha_registro'], 'icono' => 'bi-box-arrow-up-right', 'titulo' => 'Préstamo solicitado',
+                    'detalle' => $pr['equipo'] . ' · ' . ($pr['estado'] === 'Pendiente' ? 'Pendiente de confirmación' : 'Folio ' . $pr['folio'])];
+    if (!empty($pr['fecha_entrega'])) {
+        $actividad[] = ['fecha' => $pr['fecha_entrega'], 'icono' => 'bi-laptop', 'titulo' => 'Equipo entregado',
+                        'detalle' => $pr['equipo'] . ' · Préstamo ' . $pr['folio']];
     }
-
-    // Los 5 movimientos más recientes
-    usort($actividad, fn($a, $b) => strtotime($b['fecha']) <=> strtotime($a['fecha']));
-    $actividad = array_slice($actividad, 0, 5);
+    if (!empty($pr['fecha_devolucion'])) {
+        $actividad[] = ['fecha' => $pr['fecha_devolucion'], 'icono' => 'bi-arrow-return-left', 'titulo' => 'Equipo devuelto',
+                        'detalle' => $pr['equipo'] . ' · Devolución completada'];
+    }
+    if ($pr['estado'] === 'Cancelado') {
+        $actividad[] = ['fecha' => $pr['fecha_registro'], 'icono' => 'bi-x-circle', 'titulo' => 'Solicitud de préstamo rechazada',
+                        'detalle' => $pr['equipo'] . ' · Folio ' . $pr['folio']];
+    }
 }
+
+foreach ($servicios as $srv) {
+    $nombreServicio = $srv['servicio'] ?? 'Servicio general';
+    if (in_array($srv['estado'], ['Reparado', 'Entregado'], true)) {
+        $totalServiciosCompletados++;
+    } elseif ($srv['estado'] !== 'Cancelado') {
+        $totalSolicitudesEnCurso++;
+    }
+
+    $actividad[] = ['fecha' => $srv['fecha_ingreso'], 'icono' => 'bi-tools', 'titulo' => 'Servicio solicitado',
+                    'detalle' => $nombreServicio . ' · ' . $srv['equipo_receptor']];
+    if (!empty($srv['fecha_entrega']) && in_array($srv['estado'], ['Reparado', 'Entregado'], true)) {
+        $actividad[] = ['fecha' => $srv['fecha_entrega'], 'icono' => 'bi-check2-circle', 'titulo' => 'Servicio resuelto',
+                        'detalle' => $nombreServicio . ' · ' . $srv['estado']];
+    }
+}
+
+// Los 5 movimientos más recientes
+usort($actividad, fn($a, $b) => strtotime($b['fecha']) <=> strtotime($a['fecha']));
+$actividad = array_slice($actividad, 0, 5);
 
 $nombreCompleto = trim($cuenta['nombres'] . ' ' . $cuenta['apellidos']);
 ?>
@@ -322,46 +322,23 @@ $nombreCompleto = trim($cuenta['nombres'] . ' ' . $cuenta['apellidos']);
               <a class="nav-link nav-pill-link" href="acerca_de.php">Acerca de</a>
             </li>
 
-            <?php if ($esAdmin): ?>
-              <li class="nav-item ms-lg-3 d-flex align-items-center">
-                <span class="role-pill">Administrador</span>
-              </li>
-              <li class="nav-item dropdown">
-                <a
-                  class="avatar-initials"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  aria-label="Menú de la cuenta de <?= htmlspecialchars($usuario['nombres']) ?>"
-                >
-                  <?= htmlspecialchars(inicialesUsuario($usuario)) ?>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
-                  <li><span class="dropdown-item-text small fw-semibold"><?= htmlspecialchars(trim($usuario['nombres'] . ' ' . $usuario['apellidos'])) ?></span></li>
-                  <li><span class="dropdown-item-text small text-muted"><?= htmlspecialchars($usuario['correo']) ?></span></li>
+            <li class="nav-item dropdown ms-lg-2">
+              <a class="nav-link nav-pill-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle"></i>
+                <span><?= htmlspecialchars(explode(' ', $usuario['nombres'])[0]) ?></span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
+                <li><span class="dropdown-item-text small text-muted"><?= htmlspecialchars($usuario['correo']) ?></span></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item fw-semibold" aria-current="page" href="perfil.php"><i class="bi bi-person me-2"></i>Perfil</a></li>
+                <li><a class="dropdown-item" href="mis_solicitudes.php"><i class="bi bi-clipboard-check me-2"></i>Mis solicitudes</a></li>
+                <?php if ($esAdministrador): ?>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item fw-semibold" aria-current="page" href="perfil.php"><i class="bi bi-person me-2"></i>Perfil</a></li>
-                  <li><a class="dropdown-item" href="servicios.php"><i class="bi bi-clipboard-check me-2"></i>Solicitudes</a></li>
-                  <li><a class="dropdown-item" href="servicios.php?vista=catalogo"><i class="bi bi-grid me-2"></i>Catálogo de servicios</a></li>
-                  <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
-                </ul>
-              </li>
-            <?php else: ?>
-              <li class="nav-item dropdown ms-lg-2">
-                <a class="nav-link nav-pill-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-person-circle"></i>
-                  <span><?= htmlspecialchars(explode(' ', $usuario['nombres'])[0]) ?></span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
-                  <li><span class="dropdown-item-text small text-muted"><?= htmlspecialchars($usuario['correo']) ?></span></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item fw-semibold" aria-current="page" href="perfil.php"><i class="bi bi-person me-2"></i>Perfil</a></li>
-                  <li><a class="dropdown-item" href="mis_solicitudes.php"><i class="bi bi-clipboard-check me-2"></i>Mis solicitudes</a></li>
-                  <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
-                </ul>
-              </li>
-            <?php endif; ?>
+                  <li><a class="dropdown-item" href="admin/dashboard.php"><i class="bi bi-grid me-2"></i>Panel de administración</a></li>
+                <?php endif; ?>
+                <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
@@ -387,7 +364,7 @@ $nombreCompleto = trim($cuenta['nombres'] . ' ' . $cuenta['apellidos']);
           <div class="flex-grow-1 min-w-0">
             <div class="d-flex flex-wrap align-items-center gap-2 gap-md-3 mb-2">
               <h2 class="profile-name mb-0"><?= htmlspecialchars($nombreCompleto) ?></h2>
-              <span class="role-pill role-pill-sm"><?= $esAdmin ? 'Administrador' : 'Usuario' ?></span>
+              <span class="role-pill role-pill-sm"><?= $esAdministrador ? 'Administrador' : 'Usuario' ?></span>
             </div>
             <p class="profile-meta mb-1"><i class="bi bi-envelope me-2"></i><?= htmlspecialchars($cuenta['correo']) ?></p>
             <p class="profile-meta mb-0"><i class="bi bi-telephone me-2"></i><?= htmlspecialchars($cuenta['telefono']) ?></p>
@@ -395,37 +372,33 @@ $nombreCompleto = trim($cuenta['nombres'] . ' ' . $cuenta['apellidos']);
           <a href="perfil.php#mis-datos" class="btn btn-card-loan profile-edit-btn flex-shrink-0" id="botonEditarPerfil">Editar perfil</a>
         </div>
 
-        <?php if (!$esAdmin): ?>
-          <!-- Resumen de actividad (BD: prestamo y orden_servicio) -->
-          <div class="row g-3 mt-2">
-            <div class="col-md-4">
-              <div class="admin-stat-card is-highlighted h-100">
-                <span class="admin-stat-label">Préstamos activos</span>
-                <strong class="admin-stat-value"><?= $totalPrestamosActivos ?></strong>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="admin-stat-card h-100">
-                <span class="admin-stat-label">Solicitudes en curso</span>
-                <strong class="admin-stat-value"><?= $totalSolicitudesEnCurso ?></strong>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="admin-stat-card h-100">
-                <span class="admin-stat-label">Servicios completados</span>
-                <strong class="admin-stat-value"><?= $totalServiciosCompletados ?></strong>
-              </div>
+        <!-- Resumen de actividad (BD: prestamo y orden_servicio) -->
+        <div class="row g-3 mt-2">
+          <div class="col-md-4">
+            <div class="admin-stat-card is-highlighted h-100">
+              <span class="admin-stat-label">Préstamos activos</span>
+              <strong class="admin-stat-value"><?= $totalPrestamosActivos ?></strong>
             </div>
           </div>
-        <?php endif; ?>
+          <div class="col-md-4">
+            <div class="admin-stat-card h-100">
+              <span class="admin-stat-label">Solicitudes en curso</span>
+              <strong class="admin-stat-value"><?= $totalSolicitudesEnCurso ?></strong>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="admin-stat-card h-100">
+              <span class="admin-stat-label">Servicios completados</span>
+              <strong class="admin-stat-value"><?= $totalServiciosCompletados ?></strong>
+            </div>
+          </div>
+        </div>
 
         <!-- Pestañas: Mis préstamos y Mis solicitudes abren mis_solicitudes.php -->
         <nav class="admin-tabs profile-tabs mt-4" aria-label="Secciones del perfil">
           <a href="perfil.php" class="admin-tab <?= $seccionActiva === 'datos' ? 'active' : '' ?>" <?= $seccionActiva === 'datos' ? 'aria-current="page"' : '' ?>>Mis datos</a>
-          <?php if (!$esAdmin): ?>
-            <a href="mis_solicitudes.php?seccion=prestamos" class="admin-tab">Mis préstamos</a>
-            <a href="mis_solicitudes.php" class="admin-tab">Mis solicitudes</a>
-          <?php endif; ?>
+          <a href="mis_solicitudes.php?seccion=prestamos" class="admin-tab">Mis préstamos</a>
+          <a href="mis_solicitudes.php" class="admin-tab">Mis solicitudes</a>
           <a href="perfil.php?seccion=seguridad" class="admin-tab <?= $seccionActiva === 'seguridad' ? 'active' : '' ?>" <?= $seccionActiva === 'seguridad' ? 'aria-current="page"' : '' ?>>Seguridad</a>
         </nav>
       </div>
@@ -523,32 +496,30 @@ $nombreCompleto = trim($cuenta['nombres'] . ' ' . $cuenta['apellidos']);
             </div>
           </form>
 
-          <?php if (!$esAdmin): ?>
-            <!-- ================= ACTIVIDAD RECIENTE (BD: prestamo y orden_servicio) ================= -->
-            <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mt-5 mb-3">
-              <h2 class="profile-section-title mb-0">Actividad reciente</h2>
-              <a href="mis_solicitudes.php" class="footer-action-link">Ver todas mis solicitudes <i class="bi bi-arrow-right ms-1"></i></a>
-            </div>
+          <!-- ================= ACTIVIDAD RECIENTE (BD: prestamo y orden_servicio) ================= -->
+          <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mt-5 mb-3">
+            <h2 class="profile-section-title mb-0">Actividad reciente</h2>
+            <a href="mis_solicitudes.php" class="footer-action-link">Ver todas mis solicitudes <i class="bi bi-arrow-right ms-1"></i></a>
+          </div>
 
-            <?php if (count($actividad) === 0): ?>
-              <div class="db-loan-placeholder flex-column gap-2 py-4">
-                <span>Todavía no tienes movimientos.</span>
-                <a href="servicios.php" class="footer-action-link">Solicitar un servicio <i class="bi bi-arrow-right ms-1"></i></a>
-              </div>
-            <?php else: ?>
-              <ul class="activity-list list-unstyled mb-0">
-                <?php foreach ($actividad as $mov): ?>
-                  <li class="activity-item">
-                    <span class="activity-icon" aria-hidden="true"><i class="bi <?= $mov['icono'] ?>"></i></span>
-                    <div class="flex-grow-1 min-w-0">
-                      <p class="activity-title mb-0"><?= htmlspecialchars($mov['titulo']) ?></p>
-                      <p class="activity-detail mb-0"><?= htmlspecialchars($mov['detalle']) ?></p>
-                    </div>
-                    <span class="activity-date"><?= fechaActividad($mov['fecha']) ?></span>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
-            <?php endif; ?>
+          <?php if (count($actividad) === 0): ?>
+            <div class="db-loan-placeholder flex-column gap-2 py-4">
+              <span>Todavía no tienes movimientos.</span>
+              <a href="servicios.php" class="footer-action-link">Solicitar un servicio <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+          <?php else: ?>
+            <ul class="activity-list list-unstyled mb-0">
+              <?php foreach ($actividad as $mov): ?>
+                <li class="activity-item">
+                  <span class="activity-icon" aria-hidden="true"><i class="bi <?= $mov['icono'] ?>"></i></span>
+                  <div class="flex-grow-1 min-w-0">
+                    <p class="activity-title mb-0"><?= htmlspecialchars($mov['titulo']) ?></p>
+                    <p class="activity-detail mb-0"><?= htmlspecialchars($mov['detalle']) ?></p>
+                  </div>
+                  <span class="activity-date"><?= fechaActividad($mov['fecha']) ?></span>
+                </li>
+              <?php endforeach; ?>
+            </ul>
           <?php endif; ?>
 
         <?php else: ?>

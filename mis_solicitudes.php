@@ -4,6 +4,13 @@ require_once 'config/conexion.php';
 $usuario = usuarioActual();
 $empresa = obtenerDatosEmpresa($pdo);
 
+if (!defined('ROL_ADMINISTRADOR')) {
+    define('ROL_ADMINISTRADOR', 1);
+}
+// Rol real de la cuenta: el administrador conserva sus permisos y, además del menú normal,
+// ve el acceso a su panel (admin/dashboard.php) en el menú de su nombre.
+$esAdministrador = $usuario !== null && (int)$usuario['id_rol'] === ROL_ADMINISTRADOR;
+
 // Página privada: solo usuarios con sesión iniciada
 if (!$usuario) {
     header('Location: login.php?redirect=mis_solicitudes.php');
@@ -173,6 +180,10 @@ $seccionActiva = (($_GET['seccion'] ?? '') === 'prestamos') ? 'prestamos' : 'sol
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="perfil.php"><i class="bi bi-person me-2"></i>Perfil</a></li>
                 <li><a class="dropdown-item fw-semibold" aria-current="page" href="mis_solicitudes.php"><i class="bi bi-clipboard-check me-2"></i>Mis solicitudes</a></li>
+                <?php if ($esAdministrador): ?>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="admin/dashboard.php"><i class="bi bi-grid me-2"></i>Panel de administración</a></li>
+                <?php endif; ?>
                 <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
               </ul>
             </li>

@@ -1,20 +1,9 @@
 <?php
 require_once 'config/conexion.php';
 
-// Utilidades de la barra de administrador (las mismas de servicios.php e inventario.php).
-// defined() y function_exists() evitan un error si algún día se mueven a config/conexion.php.
+// defined() evita un error si algún día la constante se mueve a config/conexion.php.
 if (!defined('ROL_ADMINISTRADOR')) {
     define('ROL_ADMINISTRADOR', 1);
-}
-
-if (!function_exists('inicialesUsuario')) {
-    /**
-     * Iniciales del usuario para el avatar (ej. "Admin Principal" → "AP").
-     */
-    function inicialesUsuario(array $usuario): string {
-        $iniciales = mb_substr(trim($usuario['nombres']), 0, 1, 'UTF-8') . mb_substr(trim($usuario['apellidos']), 0, 1, 'UTF-8');
-        return $iniciales !== '' ? mb_strtoupper($iniciales, 'UTF-8') : 'U';
-    }
 }
 
 /**
@@ -61,7 +50,9 @@ function urlMapa(?string $mapa): ?string {
 
 $usuario = usuarioActual();
 $empresa = obtenerDatosEmpresa($pdo);
-$esAdmin = $usuario !== null && (int)$usuario['id_rol'] === ROL_ADMINISTRADOR;
+// Rol real de la cuenta: el administrador conserva sus permisos y, además del menú normal,
+// ve el acceso a su panel (admin/dashboard.php) en el menú de su nombre.
+$esAdministrador = $usuario !== null && (int)$usuario['id_rol'] === ROL_ADMINISTRADOR;
 
 // Nuestros valores (tabla valor) y Preguntas frecuentes (tabla faq), en el orden definido en la BD
 $valores = $pdo->query("
@@ -165,32 +156,7 @@ $correoSesion = $usuario['correo'] ?? '';
               <a class="nav-link nav-pill-link active" aria-current="page" href="acerca_de.php">Acerca de</a>
             </li>
 
-            <?php if ($esAdmin): ?>
-              <li class="nav-item ms-lg-3 d-flex align-items-center">
-                <span class="role-pill">Administrador</span>
-              </li>
-              <li class="nav-item dropdown">
-                <a
-                  class="avatar-initials"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  aria-label="Menú de la cuenta de <?= htmlspecialchars($usuario['nombres']) ?>"
-                >
-                  <?= htmlspecialchars(inicialesUsuario($usuario)) ?>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
-                  <li><span class="dropdown-item-text small fw-semibold"><?= htmlspecialchars(trim($usuario['nombres'] . ' ' . $usuario['apellidos'])) ?></span></li>
-                  <li><span class="dropdown-item-text small text-muted"><?= htmlspecialchars($usuario['correo']) ?></span></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="perfil.php"><i class="bi bi-person me-2"></i>Perfil</a></li>
-                  <li><a class="dropdown-item" href="servicios.php"><i class="bi bi-clipboard-check me-2"></i>Solicitudes</a></li>
-                  <li><a class="dropdown-item" href="servicios.php?vista=catalogo"><i class="bi bi-grid me-2"></i>Catálogo de servicios</a></li>
-                  <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
-                </ul>
-              </li>
-            <?php elseif ($usuario): ?>
+            <?php if ($usuario): ?>
               <li class="nav-item dropdown ms-lg-2">
                 <a class="nav-link nav-pill-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="bi bi-person-circle"></i>
@@ -201,6 +167,10 @@ $correoSesion = $usuario['correo'] ?? '';
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="perfil.php"><i class="bi bi-person me-2"></i>Perfil</a></li>
                   <li><a class="dropdown-item" href="mis_solicitudes.php"><i class="bi bi-clipboard-check me-2"></i>Mis solicitudes</a></li>
+                  <?php if ($esAdministrador): ?>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="admin/dashboard.php"><i class="bi bi-grid me-2"></i>Panel de administración</a></li>
+                  <?php endif; ?>
                   <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
                 </ul>
               </li>
