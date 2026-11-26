@@ -1,0 +1,248 @@
+/* =====================================================================
+   perfil.css — Estilos propios de la página "Perfil".
+   Se carga DESPUÉS de inventario.css (variables, navbar, footer y botones)
+   y de servicios.css (pestañas, tarjetas de resumen, campos e insignia).
+   ===================================================================== */
+
+/* ================= TARJETA DEL USUARIO ================= */
+.profile-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  padding: 1.6rem 1.5rem;
+}
+
+.profile-avatar {
+  width: 88px;
+  height: 88px;
+  min-width: 88px;
+  border-radius: 50%;
+  background-color: #dceafe;
+  color: var(--navy-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.profile-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.role-pill-sm {
+  padding: 0.3rem 1.25rem;
+  font-size: 0.8rem;
+}
+
+.profile-meta {
+  font-size: 0.94rem;
+  color: var(--navy-medium);
+  word-break: break-word;
+}
+
+.profile-edit-btn,
+.profile-save-btn {
+  height: 48px;
+  min-width: 208px;
+  font-size: 0.98rem;
+}
+
+/* ================= FORMULARIOS (MIS DATOS Y SEGURIDAD) ================= */
+.profile-form-card {
+  background-color: #ffffff;
+  border: 1px solid #c8d9ef;
+  border-radius: 12px;
+  padding: 1.5rem 1.7rem 1.75rem;
+}
+
+.profile-section-title {
+  font-size: clamp(1.6rem, 2.6vw, 1.875rem);
+  font-weight: 600;
+  color: var(--navy-dark);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.profile-section-title-sm {
+  font-size: 1.75rem;
+}
+
+.profile-section-text {
+  font-size: 1rem;
+  color: var(--navy-medium);
+  margin-bottom: 1.5rem;
+}
+
+/* Campo de contraseña: candado a la izquierda y botón de ojo a la derecha */
+.password-field {
+  position: relative;
+}
+
+.password-field .service-input {
+  padding-left: 2.7rem;
+  padding-right: 2.9rem;
+}
+
+.password-icon,
+.password-toggle {
+  position: absolute;
+  top: 0;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  color: #3d658f;
+  font-size: 1.05rem;
+}
+
+.password-icon {
+  left: 1rem;
+  pointer-events: none;
+}
+
+.password-toggle {
+  right: 0.75rem;
+  background: transparent;
+  border: 0;
+  padding: 0 0.3rem;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--navy-dark);
+}
+
+/* Con error o válido, Bootstrap agrega su propio ícono a la derecha: se recorre para no tapar el ojo */
+.password-field .service-input.is-invalid,
+.password-field .service-input.is-valid {
+  background-position: right 2.6rem center;
+}
+
+.profile-logout-btn {
+  height: 48px;
+  text-decoration: none;
+}
+
+/* Consejo "Cuida tu cuenta" */
+.profile-tip {
+  background-color: var(--bg-tinted);
+  border-radius: 12px;
+  padding: 1.75rem;
+}
+
+.profile-tip-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background-color: #dceafe;
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 1.4rem;
+}
+
+.profile-tip-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+  margin-bottom: 0.5rem;
+}
+
+.profile-tip-text {
+  font-size: 0.94rem;
+  color: var(--navy-medium);
+  line-height: 1.45;
+}
+
+/* ================= ACTIVIDAD RECIENTE ================= */
+.activity-list {
+  background-color: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.25rem;
+}
+
+.activity-item + .activity-item {
+  border-top: 1px solid var(--border-card);
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 10px;
+  background-color: #edf4fe;
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+
+.activity-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.activity-detail {
+  font-size: 0.94rem;
+  color: var(--navy-medium);
+  word-break: break-word;
+}
+
+.activity-date {
+  font-size: 0.9rem;
+  color: var(--navy-medium);
+  white-space: nowrap;
+  text-align: right;
+}
+
+@media (max-width: 767.98px) {
+  .profile-edit-btn,
+  .profile-save-btn {
+    width: 100%;
+  }
+
+  .activity-item {
+    flex-wrap: wrap;
+  }
+
+  .activity-date {
+    width: 100%;
+    padding-left: calc(40px + 1.25rem);
+    text-align: left;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .profile-card,
+  .profile-form-card {
+    padding: 1.35rem 1.2rem;
+  }
+
+  /* En celular las pestañas se acomodan en dos filas para que todas se vean */
+  .profile-tabs {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    overflow: visible;
+  }
+
+  .profile-tabs .admin-tab {
+    flex: 1 1 calc(50% - 0.25rem);
+    padding: 0.75rem 0.5rem;
+    font-size: 0.92rem;
+    text-align: center;
+  }
+}
